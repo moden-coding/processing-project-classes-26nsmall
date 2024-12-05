@@ -14,8 +14,7 @@ public class Coin {
         this.screensize = size;
     }
     public boolean touch(float playerXloc, float playerYloc){
-        System.out.println(Math.sqrt(Math.pow(2,playerXloc - xLoc)/Math.pow(2,playerYloc - yloc)));
-        if (Math.sqrt(Math.pow(2,playerXloc - xLoc)/Math.pow(2,playerYloc - yloc)) < screensize/20) {
+        if (Math.sqrt(Math.pow(playerXloc - xLoc,2)+Math.pow(playerYloc - yloc,2)) < 1) {
             return true;
         }
         return false;
@@ -24,6 +23,26 @@ public class Coin {
         canves.fill(255,255,0);
         canves.circle(xLoc*screensize/20f, yloc*screensize/20f, screensize/20);
     }
+    public void move(){
+        double angle = Math.random()*2*Math.PI;
+        xLoc += Math.cos(angle)*.1;
+        yloc += Math.sin(angle)*.1;
+        if (xLoc <0) {
+            xLoc=0;
+        }
+        if (yloc <0) {
+            yloc=0;
+        }
+        if (xLoc >20) {
+            xLoc = 20;
+        }
+        if (yloc >20) {
+            yloc = 20;
+        }
+
+    }
+
+
     
     
 }

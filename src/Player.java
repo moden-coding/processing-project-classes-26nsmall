@@ -11,6 +11,9 @@ public class Player {
     private float yCel = .01f;
     private PApplet canvas;
     private int screenSize;
+    private int r = 255;
+    private int g = 0;
+    private int b = 0;
     
 
     public Player(float xLoc, float yLoc, PApplet c, int size) {
@@ -21,7 +24,7 @@ public class Player {
     }
 
     public void Display() {
-        canvas.fill(255, 0, 0);
+        canvas.fill(r, g, b);
         canvas.circle(xLoc * screenSize / 20f, yLoc * screenSize / 20f, screenSize / 40);
     }
 
@@ -127,6 +130,11 @@ public class Player {
         xspeed = setter;
 
     }
+    public void setColor(int r, int g, int b){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
 
     public void SetYspeed(float setter) {
         yspeed = setter;
@@ -153,6 +161,10 @@ public class Player {
                 yLoc = yValueOfBlock(blocks);
                 yspeed = 0;
                 yCel = 0;
+                System.out.println(yLoc%1);
+                if (yLoc%1 == 1/4f) {
+                    yLoc += .01f;
+                }
             }
            
             
@@ -183,6 +195,9 @@ public class Player {
         }
         if (xLoc >20) {
             xLoc = 0;
+        }
+        if (yLoc <0){
+            yLoc = 0;
         }
 
     }

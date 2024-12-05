@@ -14,6 +14,8 @@ public class App extends PApplet {
     boolean upHeld = false;
     boolean dive = false;
     ArrayList<Coin> Coins = new ArrayList<Coin>();
+    int CoinsCollected = 0;
+    int timeWhenDive = 0;
 
     public static void main(String[] args) {
 
@@ -52,23 +54,25 @@ public class App extends PApplet {
             }
 
         }
-        
-        if (frameCount%60 == 0) {
+
+        if (frameCount % 60 == 0) {
             Coins.add(new Coin(random(1, 19), random(1, 19), size, this));
         }
-        for (Coin coin: Coins) {
+        for (Coin coin : Coins) {
+            coin.move();
             coin.Display();
         }
-        for (int i = 0; i < Coins.size(); i++){
+        for (int i = 0; i < Coins.size(); i++) {
             Coin coin = Coins.get(i);
             if (coin.touch(player.getXloc(), player.getYloc())) {
+                CoinsCollected++;
                 Coins.remove(i);
             }
         }
 
         if (leftHeld) {
             if (player.isOnBlocY(blocks)) {
-                if (player.getXSpeed() > -.1f) {
+                if (player.getXSpeed() > -.05f) {
                     if (player.getXSpeed() > 0.01f) {
                         player.SetXCel(0);
                         LeftOrRightIsPressed = false;
@@ -89,7 +93,7 @@ public class App extends PApplet {
         }
         if (rightHeld) {
             if (player.isOnBlocY(blocks)) {
-                if (player.getXSpeed() < .1f) {
+                if (player.getXSpeed() < .05f) {
                     if (player.getXSpeed() < -.01f) {
                         player.SetXCel(0);
                         LeftOrRightIsPressed = false;
@@ -107,19 +111,36 @@ public class App extends PApplet {
             }
 
         }
+        if (dive) {
+            player.setColor(0, 255, 0);
+        } else {
+            player.setColor(255, 0, 0);
+        }
+        if ((timeWhenDive - frameCount) % 15 == 0 && timeWhenDive != frameCount && timeWhenDive !=0) {
+            timeWhenDive = 0;
+            if (player.isOnBlocY(blocks)) {
+                player.SetXspeed(player.getXSpeed() / 3);
+            }
+            dive = false;
+        }
 
         player.Update(player.isOnBlocY(blocks), player.isOnBlocX(blocks), blocks, LeftOrRightIsPressed);
         player.Display();
-        if (player.isOnBlocY(blocks)) {
+        if (player.isOnBlocY(blocks) && timeWhenDive == 0) {
             dive = false;
         }
+        textSize(size / 20); 
+        fill(255);
+        text("Coins:", 16 * size / 20, size / 20);
+        text(CoinsCollected, 19 * size / 20, size / 20);
 
     }
 
     public void keyPressed() {
         if (keyCode == UP) {
             if (player.isOnBlocY(blocks)) {
-                player.SetYspeed(-.2f - Math.abs(player.getXSpeed() / 2));
+                player.SetYspeed(-.2f - (float) Math.sqrt(10 * Math.abs(player.getXSpeed())) / 10);
+                System.out.println(-.2f - (float) Math.sqrt(10 * Math.abs(player.getXSpeed())) / 10);
             }
 
         }
@@ -147,10 +168,21 @@ public class App extends PApplet {
                 } else if (player.getXCel() < 0) {
                     player.SetXspeed(-Math.abs(player.getXSpeed() * 1.1f));
                 }
-                System.out.println("2");
+
                 player.SetXCel(player.getXCel() * 1.3f);
                 player.SetYspeed(.2f);
                 dive = true;
+            } else if (dive == false) {
+                if (player.getXCel() > 0) {
+                    player.SetXspeed(Math.abs(player.getXSpeed() * 2f));
+                    timeWhenDive = frameCount;
+                    dive = true;
+                } else if (player.getXCel() < 0) {
+                    player.SetXspeed(-Math.abs(player.getXSpeed() * 2f));
+                    timeWhenDive = frameCount;
+                    dive = true;
+                }
+
             }
         }
     }
