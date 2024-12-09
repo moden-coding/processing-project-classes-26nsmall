@@ -1,5 +1,6 @@
 import processing.core.*;
-
+import java.io.PrintWriter;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -16,6 +17,10 @@ public class App extends PApplet {
     ArrayList<Coin> Coins = new ArrayList<Coin>();
     int CoinsCollected = 0;
     int timeWhenDive = 0;
+    boolean levelDrawn = false;
+    String level = "";
+    boolean mouseClicked = false;
+    float timer = -1;
 
     public static void main(String[] args) {
 
@@ -23,19 +28,6 @@ public class App extends PApplet {
     }
 
     public void setup() {
-        try (Scanner scanner = new Scanner(Paths.get("Coin_Level.txt"))) {
-            while (scanner.hasNextLine()) {
-                String blockString = scanner.nextLine();
-                String[] blockArray = blockString.split(",");
-                int xLoc = Integer.valueOf(blockArray[0]);
-                int yloc = Integer.valueOf(blockArray[1]);
-                int color = Integer.valueOf(blockArray[2]);
-                blocks[xLoc][yloc] = new Block(xLoc, yloc, color, size, this);
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
 
     }
 
@@ -45,94 +37,168 @@ public class App extends PApplet {
 
     }
 
+    public boolean mouseOnButton(float top, float bottom, float left, float right) {
+        if (mouseX > left && mouseX < right && mouseY > top && mouseY < bottom) {
+            return true;
+        }
+        return false;
+    }
+
     public void draw() {
+
         background(0);
-        for (Block[] row : blocks) {
-            for (Block block : row) {
-                if (block != null)
-                    block.Display();
-            }
+        if (level.equals("")) {
+            textSize(size / 8);
+            textAlign(CENTER);
 
-        }
-
-        if (frameCount % 60 == 0) {
-            Coins.add(new Coin(random(1, 19), random(1, 19), size, this));
-        }
-        for (Coin coin : Coins) {
-            coin.move();
-            coin.Display();
-        }
-        for (int i = 0; i < Coins.size(); i++) {
-            Coin coin = Coins.get(i);
-            if (coin.touch(player.getXloc(), player.getYloc())) {
-                CoinsCollected++;
-                Coins.remove(i);
-            }
-        }
-
-        if (leftHeld) {
-            if (player.isOnBlocY(blocks)) {
-                if (player.getXSpeed() > -.05f) {
-                    if (player.getXSpeed() > 0.01f) {
-                        player.SetXCel(0);
-                        LeftOrRightIsPressed = false;
-                    } else {
-                        player.SetXCel(-.002f);
-                        LeftOrRightIsPressed = true;
-
-                    }
-
+            rectMode(CENTER);
+            fill(255, 255, 0);
+            rect(size / 2, size * 7.1f / 16, size / 1.5f, size / 8);
+            if (mouseClicked) {
+                if (mouseOnButton(size * 7.1f / 16 - size / 8, size * 7.1f / 16 + size / 8, size / 2 - size / 1.5f,
+                        size / 2 + size / 1.5f)) {
+                    level = "Coin_Level.txt";
                 }
-
-            } else if (player.getXSpeed() >= 0 && player.getXSpeed() > -.01f) {
-                player.SetXCel(-.005f);
-                LeftOrRightIsPressed = true;
-
             }
-
-        }
-        if (rightHeld) {
-            if (player.isOnBlocY(blocks)) {
-                if (player.getXSpeed() < .05f) {
-                    if (player.getXSpeed() < -.01f) {
-                        player.SetXCel(0);
-                        LeftOrRightIsPressed = false;
-                    } else {
-                        player.SetXCel(.002f);
-                        LeftOrRightIsPressed = true;
-                    }
-
-                }
-
-            } else if (player.getXSpeed() <= 0 && player.getXSpeed() < .01f) {
-                player.SetXCel(.005f);
-                LeftOrRightIsPressed = true;
-
-            }
-
-        }
-        if (dive) {
-            player.setColor(0, 255, 0);
+            fill(255);
+            text("BALL", size / 2, size / 10);
+            fill(0);
+            text("Coin_Mode", size / 2, size / 2);
+        } else if (level.equals("Leaderboard")) {
+            textAlign(CENTER);
+            fill(255);
+            textSize(size / 8);
+            text("Leaderboard", size / 2, size / 10);
         } else {
-            player.setColor(255, 0, 0);
-        }
-        if ((timeWhenDive - frameCount) % 15 == 0 && timeWhenDive != frameCount && timeWhenDive !=0) {
-            timeWhenDive = 0;
-            if (player.isOnBlocY(blocks)) {
-                player.SetXspeed(player.getXSpeed() / 3);
-            }
-            dive = false;
-        }
+            rectMode(CORNER);
 
-        player.Update(player.isOnBlocY(blocks), player.isOnBlocX(blocks), blocks, LeftOrRightIsPressed);
-        player.Display();
-        if (player.isOnBlocY(blocks) && timeWhenDive == 0) {
-            dive = false;
+            if (levelDrawn == false) {
+                try (Scanner scanner = new Scanner(Paths.get(level))) {
+                    while (scanner.hasNextLine()) {
+                        String blockString = scanner.nextLine();
+                        String[] blockArray = blockString.split(",");
+                        int xLoc = Integer.valueOf(blockArray[0]);
+                        int yloc = Integer.valueOf(blockArray[1]);
+                        int color = Integer.valueOf(blockArray[2]);
+                        blocks[xLoc][yloc] = new Block(xLoc, yloc, color, size, this);
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+
+                levelDrawn = true;
+            }
+
+            for (Block[] row : blocks) {
+                for (Block block : row) {
+                    if (block != null)
+                        block.Display();
+                }
+
+            }
+
+            if (leftHeld) {
+                if (player.isOnBlocY(blocks)) {
+                    if (player.getXSpeed() > -.05f) {
+                        if (player.getXSpeed() > 0.01f) {
+                            player.SetXCel(0);
+                            LeftOrRightIsPressed = false;
+                        } else {
+                            player.SetXCel(-.002f);
+                            LeftOrRightIsPressed = true;
+
+                        }
+
+                    }
+
+                } else if (player.getXSpeed() >= 0 && player.getXSpeed() > -.01f) {
+                    player.SetXCel(-.005f);
+                    LeftOrRightIsPressed = true;
+
+                }
+
+            }
+            if (rightHeld) {
+                if (player.isOnBlocY(blocks)) {
+                    if (player.getXSpeed() < .05f) {
+                        if (player.getXSpeed() < -.01f) {
+                            player.SetXCel(0);
+                            LeftOrRightIsPressed = false;
+                        } else {
+                            player.SetXCel(.002f);
+                            LeftOrRightIsPressed = true;
+                        }
+
+                    }
+
+                } else if (player.getXSpeed() <= 0 && player.getXSpeed() < .01f) {
+                    player.SetXCel(.005f);
+                    LeftOrRightIsPressed = true;
+
+                }
+
+            }
+            if (dive) {
+                player.setColor(0, 255, 0);
+            } else {
+                player.setColor(255, 0, 0);
+            }
+            if ((timeWhenDive - frameCount) % 15 == 0 && timeWhenDive != frameCount && timeWhenDive != 0) {
+                timeWhenDive = 0;
+                if (player.isOnBlocY(blocks)) {
+                    player.SetXspeed(player.getXSpeed() / 3);
+                }
+                dive = false;
+            }
+
+            player.Update(player.isOnBlocY(blocks), player.isOnBlocX(blocks), blocks, LeftOrRightIsPressed);
+            player.Display();
+            if (player.isOnBlocY(blocks) && timeWhenDive == 0) {
+                dive = false;
+            }
+            if (level.equals("Coin_Level.txt")) {
+                if (timer == -1) {
+                    timer = 5;
+                }
+                timer -= .016f;
+
+                if (frameCount % 60 == 0) {
+                    Coins.add(new Coin(random(1, 19), random(1, 19), size, this));
+                }
+                for (Coin coin : Coins) {
+                    coin.move();
+                    coin.Display();
+                }
+                for (int i = 0; i < Coins.size(); i++) {
+                    Coin coin = Coins.get(i);
+                    if (coin.touch(player.getXloc(), player.getYloc())) {
+                        CoinsCollected++;
+                        Coins.remove(i);
+                    }
+                }
+                textSize(size / 20);
+                fill(255);
+                textAlign(LEFT);
+                text("Coins:", 16 * size / 20, size / 20);
+                text("Time Left: " + Math.floor(10 * timer) / 10, 0, size / 20);
+                textAlign(RIGHT);
+                text(CoinsCollected, size, size / 20);
+                if (timer <= 0) { 
+                    String filePath = "Leaderboard.txt"; 
+                    try (PrintWriter writer = new PrintWriter(filePath)) {
+                        writer.println(CoinsCollected); 
+                        writer.close(); 
+                    } catch (IOException e) {
+                        System.out.println("An error occurred while writing to the file.");
+                        e.printStackTrace();
+                    }
+                    level = "Leaderboard";
+                }
+            }
+
         }
-        textSize(size / 20); 
-        fill(255);
-        text("Coins:", 16 * size / 20, size / 20);
-        text(CoinsCollected, 19 * size / 20, size / 20);
+        mouseClicked = false;
 
     }
 
@@ -170,7 +236,7 @@ public class App extends PApplet {
                 }
 
                 player.SetXCel(player.getXCel() * 1.3f);
-                player.SetYspeed(.2f);
+                player.SetYspeed(.4f);
                 dive = true;
             } else if (dive == false) {
                 if (player.getXCel() > 0) {
@@ -198,6 +264,11 @@ public class App extends PApplet {
             player.SetXCel(0f);
             LeftOrRightIsPressed = false;
         }
+
+    }
+
+    public void mouseClicked() {
+        mouseClicked = true;
 
     }
 }
