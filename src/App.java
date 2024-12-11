@@ -21,6 +21,8 @@ public class App extends PApplet {
     String level = "";
     boolean mouseClicked = false;
     float timer = -1;
+    ArrayList<Integer> Leaderboard = new ArrayList<Integer>();
+    Boolean added = false;
 
     public static void main(String[] args) {
 
@@ -28,6 +30,20 @@ public class App extends PApplet {
     }
 
     public void setup() {
+        try (Scanner scanner = new Scanner(Paths.get("Leaderboard.txt"))) {
+            while (scanner.hasNextLine()) {
+                int numb = Integer.valueOf(scanner.nextLine());
+                Leaderboard.add(numb);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        int loops = Leaderboard.size();
+        for (int i = 0; i < 10 - loops; i++) {
+            Leaderboard.add(0);
+
+        }
 
     }
 
@@ -159,7 +175,7 @@ public class App extends PApplet {
             }
             if (level.equals("Coin_Level.txt")) {
                 if (timer == -1) {
-                    timer = 5;
+                    timer = 60;
                 }
                 timer -= .016f;
 
@@ -184,15 +200,28 @@ public class App extends PApplet {
                 text("Time Left: " + Math.floor(10 * timer) / 10, 0, size / 20);
                 textAlign(RIGHT);
                 text(CoinsCollected, size, size / 20);
-                if (timer <= 0) { 
-                    String filePath = "Leaderboard.txt"; 
-                    try (PrintWriter writer = new PrintWriter(filePath)) {
-                        writer.println(CoinsCollected); 
-                        writer.close(); 
-                    } catch (IOException e) {
-                        System.out.println("An error occurred while writing to the file.");
-                        e.printStackTrace();
+                if (timer <= 0) {
+                    for (int i = 0; i < Leaderboard.size(); i++) {
+                        if (added == false) {
+                            if (CoinsCollected >= Leaderboard.get(i)) {
+                                Leaderboard.add(i, CoinsCollected);
+                                added = true;
+                            }
+                        }
                     }
+                    if (Leaderboard.size() > 10) {
+                        Leaderboard.remove(10);
+                    }
+                    try (PrintWriter writer = new PrintWriter("Leaderboard.txt")) {
+                        for (int num : Leaderboard) {
+                            writer.println(num);
+                        }
+                        writer.close();
+
+                    } catch (IOException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                    System.out.println(Leaderboard);
                     level = "Leaderboard";
                 }
             }
