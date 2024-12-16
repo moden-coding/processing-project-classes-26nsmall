@@ -11,9 +11,7 @@ public class Player {
     private float yCel = .01f;
     private PApplet canvas;
     private int screenSize;
-    private int r = 255;
-    private int g = 0;
-    private int b = 0;
+
     
 
     public Player(float xLoc, float yLoc, PApplet c, int size) {
@@ -23,10 +21,6 @@ public class Player {
         this.canvas = c;
     }
 
-    public void Display() {
-        canvas.fill(r, g, b);
-        canvas.circle(xLoc * screenSize / 20f, yLoc * screenSize / 20f, screenSize / 40);
-    }
 
     public float getYloc() {
         return yLoc;

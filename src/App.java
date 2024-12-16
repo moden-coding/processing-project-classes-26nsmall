@@ -23,6 +23,8 @@ public class App extends PApplet {
     float timer = -1;
     ArrayList<Integer> Leaderboard = new ArrayList<Integer>();
     Boolean added = false;
+    String text ="";
+    View view;
 
     public static void main(String[] args) {
 
@@ -30,6 +32,7 @@ public class App extends PApplet {
     }
 
     public void setup() {
+        view = new View(this, size);
         try (Scanner scanner = new Scanner(Paths.get("Leaderboard.txt"))) {
             while (scanner.hasNextLine()) {
                 int numb = Integer.valueOf(scanner.nextLine());
@@ -61,8 +64,7 @@ public class App extends PApplet {
     }
 
     public void draw() {
-
-        background(0);
+        view.background();
         if (level.equals("")) {
             textSize(size / 8);
             textAlign(CENTER);
@@ -85,6 +87,17 @@ public class App extends PApplet {
             fill(255);
             textSize(size / 8);
             text("Leaderboard", size / 2, size / 10);
+            for (int i=0; i <10; i++){
+                if (i<5) {
+                    text((i+1)+". "+Leaderboard.get(i), 5*size/20,(i+2)*size/10 );
+                }
+                else{
+                    text((i+1)+". "+Leaderboard.get(i), 11*size/20,(i+2-5)*size/10 );
+                }
+                
+                
+
+            }
         } else {
             rectMode(CORNER);
 
@@ -231,7 +244,9 @@ public class App extends PApplet {
 
     }
 
-    public void keyPressed() {
+    public void  keyPressed() {
+        text += key;
+
         if (keyCode == UP) {
             if (player.isOnBlocY(blocks)) {
                 player.SetYspeed(-.2f - (float) Math.sqrt(10 * Math.abs(player.getXSpeed())) / 10);
@@ -275,7 +290,7 @@ public class App extends PApplet {
                 } else if (player.getXCel() < 0) {
                     player.SetXspeed(-Math.abs(player.getXSpeed() * 2f));
                     timeWhenDive = frameCount;
-                    dive = true;
+                    dive =  true;
                 }
 
             }
