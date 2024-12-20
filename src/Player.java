@@ -1,5 +1,3 @@
-import java.security.PublicKey;
-
 import processing.core.PApplet;
 
 public class Player {
@@ -11,8 +9,9 @@ public class Player {
     private float yCel = .01f;
     private PApplet canvas;
     private int screenSize;
-
-    
+    private int r = 255;
+    private int g = 0;
+    private int b = 0;
 
     public Player(float xLoc, float yLoc, PApplet c, int size) {
         this.screenSize = size;
@@ -21,6 +20,10 @@ public class Player {
         this.canvas = c;
     }
 
+    public void Display() {
+        canvas.fill(r, g, b);
+        canvas.circle(xLoc * screenSize / 20f, yLoc * screenSize / 20f, screenSize / 40);
+    }
 
     public float getYloc() {
         return yLoc;
@@ -31,17 +34,21 @@ public class Player {
         return xLoc;
 
     }
-    public float getXSpeed(){
+
+    public float getXSpeed() {
         return xspeed;
     }
-    public float getYSpeed(){
+
+    public float getYSpeed() {
         return yspeed;
     }
-    public void setXLoc(float setter){
+
+    public void setXLoc(float setter) {
         xLoc = setter;
 
     }
-    public void setYLoc(float setter){
+
+    public void setYLoc(float setter) {
         yLoc = setter;
 
     }
@@ -124,7 +131,8 @@ public class Player {
         xspeed = setter;
 
     }
-    public void setColor(int r, int g, int b){
+
+    public void setColor(int r, int g, int b) {
         this.r = r;
         this.g = g;
         this.b = b;
@@ -132,7 +140,6 @@ public class Player {
 
     public void SetYspeed(float setter) {
         yspeed = setter;
-        
 
     }
 
@@ -145,30 +152,78 @@ public class Player {
         yCel = setter;
 
     }
-    public float getXCel(){
+
+    public float getXCel() {
         return xCel;
     }
 
-    public void Update(Boolean isOnBlocY, Boolean isOnBlockX, Block[][] blocks, Boolean LeftOrRightIsPressed ) {
+    public boolean left(Block[][] blocks) {
+        if (isOnBlocY(blocks)) {
+            if (getXSpeed() > -.05f) {
+                if (getXSpeed() > 0.01f) {
+                    SetXCel(0);
+                    return false;
+                } else {
+                    SetXCel(-.002f);
+                    return true;
+
+                }
+
+            }
+
+        } else if (getXSpeed() >= 0 && getXSpeed() > -.01f) {
+            SetXCel(-.005f);
+            return true;
+
+        }
+        return false;
+    }
+
+    public boolean right(Block[][] blocks) {
+        if (isOnBlocY(blocks)) {
+            if (getXSpeed() < .05f) {
+                if (getXSpeed() < -0.01f) {
+                    SetXCel(0);
+                    return false;
+                } else {
+                    SetXCel(.002f);
+                    return true;
+
+                }
+
+            }
+
+        } else if (getXSpeed() <= 0 && getXSpeed() < .01f) {
+            SetXCel(.005f);
+            return true;
+
+        }
+        return false;
+    }
+    
+
+    public void Update(Boolean isOnBlocY, Boolean isOnBlockX, Block[][] blocks, Boolean LeftOrRightIsPressed) {
         if (isOnBlocY) {
             if (yValueOfBlock(blocks) != 0) {
                 yLoc = yValueOfBlock(blocks);
                 yspeed = 0;
                 yCel = 0;
-                System.out.println(yLoc%1);
-                if (yLoc%1 == 1/4f) {
+                //System.out.println(yLoc % 1);
+                if (yLoc % 1 == 1 / 4f) {
                     yLoc += .01f;
                 }
             }
-           
-            
+
             if (LeftOrRightIsPressed != true) {
+                // System.out.println(xCel);
+                // System.out.println(xspeed);
+                xCel = 0;
                 xspeed *= .9f;
             }
 
         } else {
             yCel = .01f;
-            yspeed +=yCel;
+            yspeed += yCel;
             yLoc += yspeed;
         }
         if (isOnBlockX) {
@@ -179,18 +234,18 @@ public class Player {
             }
 
         } else {
-            
+
             xspeed += xCel;
             xLoc += xspeed;
 
         }
-        if (xLoc <0) {
+        if (xLoc < 0) {
             xLoc = 20;
         }
-        if (xLoc >20) {
+        if (xLoc > 20) {
             xLoc = 0;
         }
-        if (yLoc <0){
+        if (yLoc < 0) {
             yLoc = 0;
         }
 

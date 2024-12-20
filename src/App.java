@@ -9,7 +9,6 @@ public class App extends PApplet {
     int size = 800;
     Block[][] blocks = new Block[20][20];
     Player player = new Player(1.5f, 18.75f, this, size);
-    boolean LeftOrRightIsPressed = false;
     boolean leftHeld = false;
     boolean rightHeld = false;
     boolean upHeld = false;
@@ -25,6 +24,9 @@ public class App extends PApplet {
     Boolean added = false;
     String text ="";
     View view;
+    modal model;
+    Controller controller;
+    boolean LeftOrRightIsPressed = false;
 
     public static void main(String[] args) {
 
@@ -32,7 +34,6 @@ public class App extends PApplet {
     }
 
     public void setup() {
-        view = new View(this, size);
         try (Scanner scanner = new Scanner(Paths.get("Leaderboard.txt"))) {
             while (scanner.hasNextLine()) {
                 int numb = Integer.valueOf(scanner.nextLine());
@@ -47,13 +48,15 @@ public class App extends PApplet {
             Leaderboard.add(0);
 
         }
+        
+        view = new View(this, size);
+        model = new modal(size, player, blocks, Leaderboard);
+        controller = new Controller(model, view, this);
 
     }
 
     public void settings() {
-
         size(size, size);
-
     }
 
     public boolean mouseOnButton(float top, float bottom, float left, float right) {
@@ -127,62 +130,64 @@ public class App extends PApplet {
 
             }
 
-            if (leftHeld) {
-                if (player.isOnBlocY(blocks)) {
-                    if (player.getXSpeed() > -.05f) {
-                        if (player.getXSpeed() > 0.01f) {
-                            player.SetXCel(0);
-                            LeftOrRightIsPressed = false;
-                        } else {
-                            player.SetXCel(-.002f);
-                            LeftOrRightIsPressed = true;
+            
+            // if (rightHeld) {
+            //     if (player.isOnBlocY(blocks)) {
+            //         if (player.getXSpeed() < .05f) {
+            //             if (player.getXSpeed() < -.01f) {
+            //                 player.SetXCel(0);
+            //                 LeftOrRightIsPressed = false;
+            //             } else {
+            //                 player.SetXCel(.002f);
+            //                 LeftOrRightIsPressed = true;
+            //             }
 
-                        }
+            //         }
 
-                    }
+            //     } else if (player.getXSpeed() <= 0 && player.getXSpeed() < .01f) {
+            //         player.SetXCel(.005f);
+            //         LeftOrRightIsPressed = true;
 
-                } else if (player.getXSpeed() >= 0 && player.getXSpeed() > -.01f) {
-                    player.SetXCel(-.005f);
-                    LeftOrRightIsPressed = true;
+            //     }
 
-                }
+            // }
+            // if (leftHeld) {
+            //     if (player.isOnBlocY(blocks)) {
+            //         if (player.getXSpeed() > -.05f) {
+            //             if (player.getXSpeed() > .01f) {
+            //                 player.SetXCel(0);
+            //                 LeftOrRightIsPressed = false;
+            //             } else {
+            //                 player.SetXCel(-.002f);
+            //                 LeftOrRightIsPressed = true;
+            //             }
 
-            }
-            if (rightHeld) {
-                if (player.isOnBlocY(blocks)) {
-                    if (player.getXSpeed() < .05f) {
-                        if (player.getXSpeed() < -.01f) {
-                            player.SetXCel(0);
-                            LeftOrRightIsPressed = false;
-                        } else {
-                            player.SetXCel(.002f);
-                            LeftOrRightIsPressed = true;
-                        }
+            //         }
 
-                    }
+            //     } else if (player.getXSpeed() >= 0 && player.getXSpeed() > -.01f) {
+            //         player.SetXCel(-.005f);
+            //         LeftOrRightIsPressed = true;
 
-                } else if (player.getXSpeed() <= 0 && player.getXSpeed() < .01f) {
-                    player.SetXCel(.005f);
-                    LeftOrRightIsPressed = true;
+            //     }
 
-                }
+            // }
+            // if (dive) {
+            //     player.setColor(0, 255, 0);
+            // } else {
+            //     player.setColor(255, 0, 0);
+            // }
+            // if ((timeWhenDive - frameCount) % 15 == 0 && timeWhenDive != frameCount && timeWhenDive != 0) {
+            //     timeWhenDive = 0;
+            //     if (player.isOnBlocY(blocks)) {
+            //         player.SetXspeed(player.getXSpeed() / 3);
+            //     }
+            //     dive = false;
+            // }
+            controller.Update();
+            controller.render();
 
-            }
-            if (dive) {
-                player.setColor(0, 255, 0);
-            } else {
-                player.setColor(255, 0, 0);
-            }
-            if ((timeWhenDive - frameCount) % 15 == 0 && timeWhenDive != frameCount && timeWhenDive != 0) {
-                timeWhenDive = 0;
-                if (player.isOnBlocY(blocks)) {
-                    player.SetXspeed(player.getXSpeed() / 3);
-                }
-                dive = false;
-            }
-
-            player.Update(player.isOnBlocY(blocks), player.isOnBlocX(blocks), blocks, LeftOrRightIsPressed);
-            player.Display();
+          //]  player.Update(player.isOnBlocY(blocks), player.isOnBlocX(blocks), blocks, LeftOrRightIsPressed);
+            //player.Display();
             if (player.isOnBlocY(blocks) && timeWhenDive == 0) {
                 dive = false;
             }
@@ -191,40 +196,33 @@ public class App extends PApplet {
                     timer = 60;
                 }
                 timer -= .016f;
+                // if (frameCount % 60 == 0) {
+                //          model.addCoin((new Coin(random(1, 19), random(1, 19), size, this)));
+                //     }
 
-                if (frameCount % 60 == 0) {
-                    Coins.add(new Coin(random(1, 19), random(1, 19), size, this));
-                }
-                for (Coin coin : Coins) {
-                    coin.move();
-                    coin.Display();
-                }
-                for (int i = 0; i < Coins.size(); i++) {
-                    Coin coin = Coins.get(i);
-                    if (coin.touch(player.getXloc(), player.getYloc())) {
-                        CoinsCollected++;
-                        Coins.remove(i);
-                    }
-                }
-                textSize(size / 20);
-                fill(255);
-                textAlign(LEFT);
-                text("Coins:", 16 * size / 20, size / 20);
-                text("Time Left: " + Math.floor(10 * timer) / 10, 0, size / 20);
-                textAlign(RIGHT);
-                text(CoinsCollected, size, size / 20);
+                // if (frameCount % 60 == 0) {
+                //     Coins.add((new Coin(random(1, 19), random(1, 19), size, this)));
+                // }
+                // for (Coin coin : Coins) {
+                //     coin.move();
+                //     coin.Display();
+                // }
+                // for (int i = 0; i < Coins.size(); i++) {
+                //     Coin coin = Coins.get(i);
+                //     if (coin.touch(player.getXloc(), player.getYloc())) {
+                //         CoinsCollected++;
+                //         Coins.remove(i);
+                //     }
+                // }
+                // textSize(size / 20);
+                // fill(255);
+                // textAlign(LEFT);
+                // text("Coins:", 16 * size / 20, size / 20);
+                // text("Time Left: " + Math.floor(10 * timer) / 10, 0, size / 20);
+                // textAlign(RIGHT);  
+                // text(CoinsCollected, size, size / 20);
                 if (timer <= 0) {
-                    for (int i = 0; i < Leaderboard.size(); i++) {
-                        if (added == false) {
-                            if (CoinsCollected >= Leaderboard.get(i)) {
-                                Leaderboard.add(i, CoinsCollected);
-                                added = true;
-                            }
-                        }
-                    }
-                    if (Leaderboard.size() > 10) {
-                        Leaderboard.remove(10);
-                    }
+                    
                     try (PrintWriter writer = new PrintWriter("Leaderboard.txt")) {
                         for (int num : Leaderboard) {
                             writer.println(num);
@@ -245,69 +243,72 @@ public class App extends PApplet {
     }
 
     public void  keyPressed() {
+        
         text += key;
+        controller.handlekeyPressed(keyCode);
 
-        if (keyCode == UP) {
-            if (player.isOnBlocY(blocks)) {
-                player.SetYspeed(-.2f - (float) Math.sqrt(10 * Math.abs(player.getXSpeed())) / 10);
-                System.out.println(-.2f - (float) Math.sqrt(10 * Math.abs(player.getXSpeed())) / 10);
-            }
+        // if (keyCode == UP) {
+        //     if (player.isOnBlocY(blocks)) {
+        //         player.SetYspeed(-.2f - (float) Math.sqrt(10 * Math.abs(player.getXSpeed())) / 10);
+        //         System.out.println(-.2f - (float) Math.sqrt(10 * Math.abs(player.getXSpeed())) / 10);
+        //     }
 
-        }
-        if (key == 'f') {
-            player.setXLoc(1.5f);
-            player.setYLoc(18.75f);
-            player.SetXspeed(0);
-            player.SetYspeed(0);
-            player.SetXCel(0);
-            player.SetYCel(0);
-        }
+        // }
+        // if (key == 'f') {
+        //     player.setXLoc(1.5f);
+        //     player.setYLoc(18.75f);
+        //     player.SetXspeed(0);
+        //     player.SetYspeed(0);
+        //     player.SetXCel(0);
+        //     player.SetYCel(0);
+        // }
 
-        if (keyCode == LEFT) {
-            leftHeld = true;
+        // if (keyCode == LEFT) {
+        //     leftHeld = true;
 
-        }
-        if (keyCode == RIGHT) {
-            rightHeld = true;
+        // }
+        // if (keyCode == RIGHT) {
+        //     rightHeld = true;
 
-        }
-        if (keyCode == DOWN) {
-            if (player.isOnBlocY(blocks) == false && dive == false) {
-                if (player.getXCel() > 0) {
-                    player.SetXspeed(Math.abs(player.getXSpeed() * 1.1f));
-                } else if (player.getXCel() < 0) {
-                    player.SetXspeed(-Math.abs(player.getXSpeed() * 1.1f));
-                }
+        // }
+        // if (keyCode == DOWN) {
+        //     if (player.isOnBlocY(blocks) == false && dive == false) {
+        //         if (player.getXCel() > 0) {
+        //             player.SetXspeed(Math.abs(player.getXSpeed() * 1.1f));
+        //         } else if (player.getXCel() < 0) {
+        //             player.SetXspeed(-Math.abs(player.getXSpeed() * 1.1f));
+        //         }
 
-                player.SetXCel(player.getXCel() * 1.3f);
-                player.SetYspeed(.4f);
-                dive = true;
-            } else if (dive == false) {
-                if (player.getXCel() > 0) {
-                    player.SetXspeed(Math.abs(player.getXSpeed() * 2f));
-                    timeWhenDive = frameCount;
-                    dive = true;
-                } else if (player.getXCel() < 0) {
-                    player.SetXspeed(-Math.abs(player.getXSpeed() * 2f));
-                    timeWhenDive = frameCount;
-                    dive =  true;
-                }
+        //         player.SetXCel(player.getXCel() * 1.3f);
+        //         player.SetYspeed(.4f);
+        //         dive = true;
+        //     } else if (dive == false) {
+        //         if (player.getXCel() > 0) {
+        //             player.SetXspeed(Math.abs(player.getXSpeed() * 2f));
+        //             timeWhenDive = frameCount;
+        //             dive = true;
+        //         } else if (player.getXCel() < 0) {
+        //             player.SetXspeed(-Math.abs(player.getXSpeed() * 2f));
+        //             timeWhenDive = frameCount;
+        //             dive =  true;
+        //         }
 
-            }
-        }
+        //     }
+        // }
     }
 
     public void keyReleased() {
-        if (keyCode == LEFT) {
-            player.SetXCel(0f);
-            leftHeld = false;
-            LeftOrRightIsPressed = false;
-        }
-        if (keyCode == RIGHT) {
-            rightHeld = false;
-            player.SetXCel(0f);
-            LeftOrRightIsPressed = false;
-        }
+        controller.handlekeyReleased(keyCode);
+        // if (keyCode == LEFT) {
+        //     player.SetXCel(0f);
+        //     leftHeld = false;
+        //     LeftOrRightIsPressed = false;
+        // }
+        // if (keyCode == RIGHT) {
+        //     rightHeld = false;
+        //     player.SetXCel(0f);
+        //     LeftOrRightIsPressed = false;
+        // }
 
     }
 
