@@ -22,6 +22,7 @@ public class Controller {
         this.canvas = c;
         Coins = model.getCoins();
     }
+    //comment
     public void Update(){
         Player player = model.getPlayer();
         

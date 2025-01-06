@@ -6,7 +6,7 @@ import java.util.*;
 
 public class App extends PApplet {
 
-    int size = 800;
+    int size = 801;
     Block[][] blocks = new Block[20][20];
     Player player = new Player(1.5f, 18.75f, this, size);
     boolean leftHeld = false;
@@ -27,6 +27,7 @@ public class App extends PApplet {
     modal model;
     Controller controller;
     boolean LeftOrRightIsPressed = false;
+    
 
     public static void main(String[] args) {
 
