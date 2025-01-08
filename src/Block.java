@@ -14,10 +14,12 @@ public class Block {
         this.canves = c;
         this.screensize = size;
     }
+    //displays block
     public void Display(){
         canves.fill(color);
         canves.square(xLoc*screensize/20f, yloc*screensize/20f, screensize/20);
     }
+    //location getters
     public int xLoc(){
         return xLoc;
     }

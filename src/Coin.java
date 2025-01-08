@@ -13,16 +13,19 @@ public class Coin {
         this.canves = c;
         this.screensize = size;
     }
+    // check if coin is touvhing player
     public boolean touch(float playerXloc, float playerYloc){
         if (Math.sqrt(Math.pow(playerXloc - xLoc,2)+Math.pow(playerYloc - yloc,2)) < 1) {
             return true;
         }
         return false;
     }
+    // displays the coin
     public void Display(){
         canves.fill(255,255,0);
         canves.circle(xLoc*screensize/20f, yloc*screensize/20f, screensize/20);
     }
+    //moves the coin randomly 
     public void move(){
         double angle = Math.random()*2*Math.PI;
         xLoc += Math.cos(angle)*.1;

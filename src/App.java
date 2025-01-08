@@ -35,6 +35,7 @@ public class App extends PApplet {
     }
 
     public void setup() {
+        // leaderboard logic
         try (Scanner scanner = new Scanner(Paths.get("Leaderboard.txt"))) {
             while (scanner.hasNextLine()) {
                 int numb = Integer.valueOf(scanner.nextLine());
@@ -49,7 +50,7 @@ public class App extends PApplet {
             Leaderboard.add(0);
 
         }
-        
+        //sets up model view controll
         view = new View(this, size);
         model = new modal(size, player, blocks, Leaderboard);
         controller = new Controller(model, view, this);
@@ -59,7 +60,7 @@ public class App extends PApplet {
     public void settings() {
         size(size, size);
     }
-
+// simple mouse detection for buttons
     public boolean mouseOnButton(float top, float bottom, float left, float right) {
         if (mouseX > left && mouseX < right && mouseY > top && mouseY < bottom) {
             return true;
@@ -69,6 +70,7 @@ public class App extends PApplet {
 
     public void draw() {
         view.background();
+        // menu
         if (level.equals("")) {
             textSize(size / 8);
             textAlign(CENTER);
@@ -104,7 +106,7 @@ public class App extends PApplet {
             }
         } else {
             rectMode(CORNER);
-
+// scans file to draw the level
             if (levelDrawn == false) {
                 try (Scanner scanner = new Scanner(Paths.get(level))) {
                     while (scanner.hasNextLine()) {
@@ -184,6 +186,7 @@ public class App extends PApplet {
             //     }
             //     dive = false;
             // }
+            // updates things
             controller.Update();
             controller.render();
 
@@ -222,6 +225,7 @@ public class App extends PApplet {
                 // text("Time Left: " + Math.floor(10 * timer) / 10, 0, size / 20);
                 // textAlign(RIGHT);  
                 // text(CoinsCollected, size, size / 20);
+                //writes to leaderboard
                 if (timer <= 0) {
                     
                     try (PrintWriter writer = new PrintWriter("Leaderboard.txt")) {

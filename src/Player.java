@@ -19,12 +19,12 @@ public class Player {
         this.yLoc = yLoc;
         this.canvas = c;
     }
-
+//player display function
     public void Display() {
         canvas.fill(r, g, b);
         canvas.circle(xLoc * screenSize / 20f, yLoc * screenSize / 20f, screenSize / 40);
     }
-
+//all getters and setters for movement
     public float getYloc() {
         return yLoc;
 
@@ -42,6 +42,9 @@ public class Player {
     public float getYSpeed() {
         return yspeed;
     }
+    public float getXCel() {
+        return xCel;
+    }
 
     public void setXLoc(float setter) {
         xLoc = setter;
@@ -52,7 +55,32 @@ public class Player {
         yLoc = setter;
 
     }
+    public void SetXspeed(float setter) {
+        xspeed = setter;
 
+    }
+
+    public void setColor(int r, int g, int b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+
+    public void SetYspeed(float setter) {
+        yspeed = setter;
+
+    }
+
+    public void SetXCel(float setter) {
+        xCel = setter;
+
+    }
+
+    public void SetYCel(float setter) {
+        yCel = setter;
+
+    }
+//These to isonbloc functions handle player collision detection to the blocks in a smooth way
     public boolean isOnBlocY(Block[][] blocks) {
         for (Block[] blocksss : blocks) {
             for (Block block : blocksss) {
@@ -84,7 +112,7 @@ public class Player {
         }
         return false;
     }
-
+//These to functions allow for getting the specific values of the block that is being touched in order to move the player out of the block to the right spot
     public float yValueOfBlock(Block[][] blocks) {
         for (Block[] blocksss : blocks) {
             for (Block block : blocksss) {
@@ -127,36 +155,10 @@ public class Player {
         return 0;
     }
 
-    public void SetXspeed(float setter) {
-        xspeed = setter;
+    
 
-    }
-
-    public void setColor(int r, int g, int b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-    }
-
-    public void SetYspeed(float setter) {
-        yspeed = setter;
-
-    }
-
-    public void SetXCel(float setter) {
-        xCel = setter;
-
-    }
-
-    public void SetYCel(float setter) {
-        yCel = setter;
-
-    }
-
-    public float getXCel() {
-        return xCel;
-    }
-
+    
+//these two functions handle moving the player left and right based on accel and speed
     public boolean left(Block[][] blocks) {
         if (isOnBlocY(blocks)) {
             if (getXSpeed() > -.05f) {
@@ -201,7 +203,7 @@ public class Player {
         return false;
     }
     
-
+//this is the main udate loop for the player that checks the collison and updates the posisiton.
     public void Update(Boolean isOnBlocY, Boolean isOnBlockX, Block[][] blocks, Boolean LeftOrRightIsPressed) {
         if (isOnBlocY) {
             if (yValueOfBlock(blocks) != 0) {

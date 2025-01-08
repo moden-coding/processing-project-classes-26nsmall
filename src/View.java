@@ -10,6 +10,7 @@ public class View {
         this.canvas = c;
         this.size = size;
     }
+    //this class contains all the neccasray functions to draw out each object in the game/
     public void background(){
         canvas.background(0);
     }

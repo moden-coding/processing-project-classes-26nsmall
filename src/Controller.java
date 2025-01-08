@@ -22,7 +22,7 @@ public class Controller {
         this.canvas = c;
         Coins = model.getCoins();
     }
-    //comment
+    //main update loop that handles update each  thing such as player movement and coin movement
     public void Update(){
         Player player = model.getPlayer();
         
@@ -71,7 +71,7 @@ public class Controller {
         }
         Coins = model.getCoins();
     }
-    
+    //handles key presses
     public void handlekeyPressed(int keyCode){
         Player player = model.getPlayer();
         if(keyCode == canvas.DOWN){
@@ -122,6 +122,7 @@ public class Controller {
             LeftOrRightIsPressed = false;
         }
     }
+    //handles rendering all the things needed for the gaim to work
     public void render(){
         view.background();
         view.drawBlocks(model.getBlocks());

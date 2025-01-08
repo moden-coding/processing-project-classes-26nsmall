@@ -14,6 +14,7 @@ public class modal {
         this.coinsCollected = 0;
         this.leaderboard = leaderboard;
     }
+    //this class contains getters and settters for every piece of information 
     public Block[][] getBlocks() {
         return blocks;
     }
@@ -44,7 +45,7 @@ public class modal {
         coins.remove(coin);
         coinsCollected++;
     }
-
+//fucnction for leaderboard logic
     public ArrayList<Integer> getLeaderboard() {
         return leaderboard;
     }
